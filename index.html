@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>George Liu | Portfolio</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        /* Modern V9 Theme (Strict Vamsee Aesthetic Parity) */
+        :root {
+            --bg: #fdfdfd;
+            --text-main: #171717;
+            --text-muted: #525252;
+            --text-dim: #737373;
+            --border: #e5e5e5;
+            --card-bg: #ffffff;
+            --pill-bg: #f3f4f6;
+            --pill-text: #374151;
+            --accent: #3b82f6; 
+            --font-sans: 'Inter', sans-serif;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        [data-theme="dark"] {
+            --bg: #0a0a0a;
+            --text-main: #f3f4f6;
+            --text-muted: #a3a3a3;
+            --text-dim: #737373;
+            --border: #262626;
+            --card-bg: #111111;
+            --pill-bg: #1f2937;
+            --pill-text: #d1d5db;
+            --accent: #5eead4;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { 
+            font-family: var(--font-sans); 
+            color: var(--text-main); 
+            background-color: var(--bg); 
+            line-height: 1.6; 
+            overflow-x: hidden; 
+            -webkit-font-smoothing: antialiased;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Splash Screen */
+        #splash-screen {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: var(--bg); z-index: 99999;
+            transition: background-color 0.8s ease, visibility 0.8s ease;
+        }
+        #splash-text {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2.5rem; font-weight: 600; letter-spacing: 0.1em;
+            color: var(--text-main);
+            border-right: 2px solid var(--accent);
+            white-space: nowrap;
+            transition: top 0.8s cubic-bezier(0.8, 0, 0.2, 1), 
+                        left 0.8s cubic-bezier(0.8, 0, 0.2, 1), 
+                        transform 0.8s cubic-bezier(0.8, 0, 0.2, 1),
+                        font-size 0.8s cubic-bezier(0.8, 0, 0.2, 1);
+        }
+        @keyframes blink { 50% { border-color: transparent } }
+        .typing-cursor { animation: blink 0.7s step-end infinite; }
+        
+        .content-hidden { opacity: 0; pointer-events: none; }
+        .content-ready { opacity: 1; pointer-events: auto; transition: opacity 0.8s ease; }
+
+        /* Sticky Nav Header */
+        header {
+            position: fixed; top: 0; left: 0; width: 100%;
+            padding: 1.5rem 2rem;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(var(--bg-rgb), 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 100;
+            border-bottom: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+        header.scrolled { border-bottom-color: var(--border); box-shadow: var(--shadow); }
+        .nav-logo { font-weight: 600; font-size: 1.25rem; letter-spacing: 0.1em; color: var(--text-main); text-decoration: none;}
+        .nav-actions { display: flex; align-items: center; gap: 1.5rem; }
+        .nav-link { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: color 0.2s;}
+        .nav-link:hover { color: var(--text-main); }
+        @media (max-width: 600px) { .nav-link { display: none; } } /* Hide text links on mobile */
+        
+        .theme-toggle {
+            background: none; border: 1px solid var(--border); border-radius: 50%; width: 36px; height: 36px;
+            display: flex; justify-content: center; align-items: center; cursor: pointer; color: var(--text-main);
+            transition: all 0.2s;
+        }
+        .theme-toggle:hover { background: var(--pill-bg); }
+
+        /* Layout Container */
+        .layout {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* Scroll Animations (Fade In Up) */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .d-1 { transition-delay: 0.1s; }
+        .d-2 { transition-delay: 0.2s; }
+        .d-3 { transition-delay: 0.3s; }
+
+        /* Hero Full Height */
+        .hero { 
+            min-height: 100vh; display: flex; flex-direction: column; justify-content: center; 
+            padding-top: 5rem; /* Account for fixed header */
+        }
+        .hero-tag { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-muted); margin-bottom: 1rem; }
+        .hero-name { font-size: 3.5rem; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 1.5rem; line-height: 1.1; }
+        .hero-bio { font-size: 1.15rem; color: var(--text-muted); max-width: 650px; line-height: 1.7; margin-bottom: 2.5rem;}
+        
+        .contact-links { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .btn-icon { 
+            display: inline-flex; justify-content: center; align-items: center; color: var(--text-main); 
+            width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--border); 
+            text-decoration: none; transition: all 0.2s; background: var(--card-bg);
+        }
+        .btn-icon:hover { color: var(--bg); background: var(--text-main); border-color: var(--text-main); }
+        
+        .scroll-down-indicator {
+            position: absolute; bottom: 3rem; left: 50%; transform: translateX(-50%);
+            display: flex; flex-direction: column; align-items: center; color: var(--text-muted);
+            animation: bounce 2s infinite; opacity: 0.6;
+        }
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateY(0) translateX(-50%); } 40% { transform: translateY(-10px) translateX(-50%); } 60% { transform: translateY(-5px) translateX(-50%); } }
+
+        /* Sections General */
+        section { padding-top: 6rem; margin-bottom: 4rem; scroll-margin-top: 6rem;}
+        .section-title { font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 2rem; position: relative; display: inline-block;}
+        .section-title::after { content: ''; position: absolute; bottom: -8px; left: 0; width: 40px; height: 2px; background: var(--text-main); }
+
+        /* About Me 2-Column */
+        .about-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 3rem; align-items: start; }
+        @media (max-width: 768px) { .about-grid { grid-template-columns: 1fr; gap: 2rem; } }
+        
+        .about-bio { color: var(--text-muted); font-size: 1.05rem; line-height: 1.8; white-space: pre-wrap;}
+        
+        .about-sidebar { display: flex; flex-direction: column; gap: 1.5rem; }
+        .edu-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; }
+        .edu-school { font-weight: 600; color: var(--text-main); font-size: 1.1rem; margin-bottom: 0.5rem;}
+        .edu-details { color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;}
+        
+        /* Utility Accordion for About Sidebar */
+        .acc-group { border: 1px solid var(--border); border-radius: 12px; background: var(--card-bg); overflow: hidden;}
+        .acc-header { padding: 1rem 1.25rem; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-weight: 500; font-size: 0.95rem; user-select: none; transition: background 0.2s;}
+        .acc-header:hover { background: var(--bg); }
+        .acc-icon { color: var(--text-muted); transition: transform 0.3s ease; }
+        .acc-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; background: var(--bg); }
+        .acc-content-inner { padding: 1rem 1.25rem; font-size: 0.9rem; color: var(--text-muted); }
+        .acc-group.open .acc-icon { transform: rotate(180deg); }
+        .acc-group.open .acc-header { border-bottom: 1px solid var(--border); }
+        
+        .list-items { list-style-type: disc; margin-left: 1rem; }
+        .list-items li { margin-bottom: 0.4rem; }
+
+        /* Expandable Experience Cards */
+        .experience-list { display: flex; flex-direction: column; gap: 1rem; }
+        .exp-card {
+            background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+            overflow: hidden; transition: all 0.3s ease;
+        }
+        .exp-card:hover { border-color: var(--text-muted); }
+        
+        .exp-header { padding: 1.5rem; display: flex; align-items: center; gap: 1.25rem; cursor: pointer; }
+        .company-logo { width: 44px; height: 44px; border-radius: 8px; object-fit: contain; background: #fff; padding: 4px; border: 1px solid #e5e5e5; }
+        
+        .exp-info { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+        .exp-role-row { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.1rem;}
+        .exp-company { font-weight: 600; color: var(--text-main); font-size: 1.1rem; }
+        .exp-separator { color: var(--text-dim); }
+        .exp-title { color: var(--text-muted); font-size: 0.95rem; }
+        
+        .exp-meta { display: flex; align-items: center; gap: 1rem; color: var(--text-muted); font-size: 0.85rem; }
+        .exp-chevron { color: var(--text-muted); transition: transform 0.3s ease; }
+        
+        .exp-card.expanded .exp-chevron { transform: rotate(180deg); }
+        .exp-card.expanded .exp-header { border-bottom: 1px solid var(--border); }
+        
+        .exp-body {
+            max-height: 0; overflow: hidden; transition: max-height 0.3s ease-in-out; background: var(--bg);
+        }
+        .exp-body-inner { padding: 1.5rem 1.5rem 1.5rem 5rem; }
+        .exp-details { list-style-type: disc; color: var(--text-muted); font-size: 0.95rem; margin-left: 1rem; line-height: 1.6;}
+        .exp-details li { margin-bottom: 0.5rem; }
+
+        @media (max-width: 600px) {
+            .exp-header { flex-direction: column; align-items: flex-start; gap: 1rem; position: relative;}
+            .exp-meta { position: absolute; top: 1.5rem; right: 1.5rem; }
+            .exp-date { display: none; }
+            .exp-body-inner { padding: 1.5rem; }
+        }
+
+        /* Skills Accordions */
+        .skills-container { display: flex; flex-direction: column; gap: 1rem; }
+        .skill-acc { border: 1px solid var(--border); border-radius: 12px; background: var(--card-bg); overflow: hidden; transition: border-color 0.2s;}
+        .skill-acc:hover { border-color: var(--text-muted); }
+        .skill-header { padding: 1.25rem; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .skill-title { font-weight: 600; font-size: 1.05rem; }
+        .skill-count { font-size: 0.8rem; color: var(--text-main); background: var(--pill-bg); padding: 2px 8px; border-radius: 12px; font-weight: 500;}
+        .skill-meta { display: flex; align-items: center; gap: 1rem; color: var(--text-muted); }
+        
+        .skill-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; background: var(--bg); }
+        .skill-pills { padding: 1.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        
+        .skill-acc.open .acc-icon { transform: rotate(180deg); }
+        .skill-acc.open .skill-header { border-bottom: 1px solid var(--border); }
+
+        .skill-pill { 
+            background: var(--card-bg); color: var(--pill-text); padding: 6px 14px; 
+            border-radius: 20px; font-size: 0.85rem; font-weight: 500; border: 1px solid var(--border); transition: all 0.2s;
+        }
+        .skill-pill:hover { border-color: var(--text-main); color: var(--text-main); }
+
+        /* Gallery Grid */
+        .gallery-wrap { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
+        .gallery-photo { width: 100%; height: 160px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); transition: transform 0.2s;}
+        .gallery-photo:hover { transform: scale(1.02); }
+
+        /* Footer */
+        footer { border-top: 1px solid var(--border); padding: 2rem 0; text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-top: 4rem;}
+
+
+        /* Admin CMS Pattern */
+        .edit-fab {
+            position: fixed; bottom: 1.5rem; right: 1.5rem; background: var(--text-main); color: var(--bg);
+            border: none; padding: 0.75rem 1.25rem; border-radius: 30px; font-weight: 500; font-family: var(--font-sans);
+            cursor: pointer; display: flex; align-items: center; gap: 0.5rem; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            z-index: 9000; transition: transform 0.2s; font-size: 0.9rem;
+        }
+        .edit-fab:hover { transform: scale(1.05); }
+
+        .admin-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px); z-index: 9999; display: flex; justify-content: flex-end;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .admin-overlay.open { opacity: 1; pointer-events: auto; }
+
+        .admin-panel {
+            width: 600px; max-width: 100%; height: 100%; background: var(--card-bg); border-left: 1px solid var(--border);
+            box-shadow: -10px 0 40px rgba(0,0,0,0.2); transform: translateX(100%); transition: transform 0.3s;
+            display: flex; flex-direction: column; color: var(--text-main);
+        }
+        .admin-overlay.open .admin-panel { transform: translateX(0); }
+
+        .admin-header { padding: 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--card-bg);}
+        .admin-header h2 { margin: 0; font-size: 1.1rem; color: var(--text-main); font-weight: 600;}
+        .admin-close { background: none; border: none; cursor: pointer; color: var(--text-muted); }
+        .admin-close:hover { color: var(--text-main); }
+
+        .admin-body { flex: 1; overflow-y: auto; padding: 1.5rem; background: var(--bg);}
+        
+        .admin-section { background: var(--card-bg); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 1.5rem; }
+        .admin-section h3 { margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; color: var(--text-main); font-weight: 600; font-size: 1rem;}
+        
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+        
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 500; color: var(--text-muted); margin-bottom: 0.4rem; }
+        .form-control { width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 6px; font-family: var(--font-sans); background: var(--bg); color: var(--text-main); transition: border-color 0.2s;}
+        .form-control:focus { outline: none; border-color: var(--accent); }
+        textarea.form-control { min-height: 100px; resize: vertical; }
+
+        .admin-list-item { background: var(--bg); padding: 1.25rem; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 1rem; position: relative;}
+        .remove-btn { position: absolute; top: 0.5rem; right: 0.5rem; background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); width: 26px; height: 26px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center;}
+        .add-btn { width: 100%; padding: 0.75rem; background: transparent; border: 1px dashed var(--border); color: var(--text-muted); border-radius: 6px; cursor: pointer; font-family: var(--font-sans); font-weight: 500;}
+        .add-btn:hover { border-color: var(--text-main); color: var(--text-main); }
+
+        .admin-footer { padding: 1.5rem; border-top: 1px solid var(--border); background: var(--card-bg); }
+        .save-btn { width: 100%; padding: 0.85rem; background: var(--text-main); color: var(--bg); border: none; border-radius: 8px; font-weight: 500; font-size: 1rem; cursor: pointer; transition: opacity 0.2s; }
+        .save-btn:hover { opacity: 0.8; }
+        
+    </style>
+</head>
+<body>
+
+    <!-- Splash Screen -->
+    <div id="splash-screen">
+        <span id="splash-text" class="typing-cursor"></span>
+    </div>
+
+    <!-- Main Content (Hidden Initially) -->
+    <div id="main-wrapper" class="content-hidden">
+        <header id="main-header">
+            <a href="#" class="nav-logo" id="nav-logo">GL</a>
+            <nav class="nav-actions">
+                <a href="#about" class="nav-link">About</a>
+                <a href="#experience" class="nav-link">Experience</a>
+                <a href="#skills" class="nav-link">Skills</a>
+                <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle theme">
+                    <i data-lucide="moon" id="theme-icon" size="18"></i>
+                </button>
+            </nav>
+        </header>
+
+        <div class="layout">
+            <main>
+                <!-- Hero Full Height -->
+                <section class="hero" id="home">
+                    <div id="hero-container"></div>
+                    <div class="scroll-down-indicator">
+                        <i data-lucide="chevron-down"></i>
+                    </div>
+                </section>
+
+                <!-- About Me (2 Column) -->
+                <section id="about">
+                    <div class="section-title fade-in-up">About</div>
+                    <div class="about-grid fade-in-up d-1" id="about-container"></div>
+                </section>
+
+                <!-- Experience -->
+                <section id="experience">
+                    <div class="section-title fade-in-up">Where I’ve Worked</div>
+                    <div class="experience-list fade-in-up d-1" id="experience-container"></div>
+                </section>
+
+                <!-- Skills -->
+                <section id="skills">
+                    <div class="section-title fade-in-up">Skills & Capabilities</div>
+                    <div class="skills-container fade-in-up d-1" id="skills-container"></div>
+                </section>
+
+                <!-- Gallery -->
+                <section id="gallery">
+                    <div class="section-title fade-in-up">Gallery</div>
+                    <div class="gallery-wrap fade-in-up d-1" id="gallery-container"></div>
+                </section>
+                
+                <footer>
+                    <p>© 2026 George Liu. Built with precision.</p>
+                </footer>
+            </main>
+        </div>
+    </div> <!-- End main-wrapper -->
+
+
+    <!-- CMS Button -->
+    <button class="edit-fab" id="edit-fab-btn" onclick="openAdmin()" style="display: none;">
+        <i data-lucide="edit-3"></i> Edit Portfolio
+    </button>
+
+    <!-- Comprehensive Admin Modal -->
+    <div class="admin-overlay" id="admin-modal">
+        <div class="admin-panel">
+            <div class="admin-header">
+                <h2>Content Editor</h2>
+                <button class="admin-close" onclick="closeAdmin()"><i data-lucide="x"></i></button>
+            </div>
+            
+            <div class="admin-body" id="admin-forms">
+                <!-- Profile Section -->
+                <div class="admin-section">
+                    <h3>Profile Information</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input class="form-control" id="edit-name">
+                        </div>
+                        <div class="form-group">
+                            <label>Tagline</label>
+                            <input class="form-control" id="edit-tagline">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Avatar URL</label>
+                        <input class="form-control" id="edit-avatar">
+                    </div>
+                    <div class="form-group">
+                        <label>Short Hero Bio</label>
+                        <textarea class="form-control" id="edit-bio" style="min-height: 80px;"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Full About Section Text</label>
+                        <textarea class="form-control" id="edit-about"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input class="form-control" id="edit-email">
+                        </div>
+                        <div class="form-group">
+                            <label>LinkedIn URL</label>
+                            <input class="form-control" id="edit-linkedin">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Resume Filename</label>
+                        <input class="form-control" id="edit-resume">
+                    </div>
+                </div>
+
+                <!-- Education Section -->
+                <div class="admin-section">
+                    <h3>Education</h3>
+                    <div id="edit-education-list"></div>
+                    <button class="add-btn" onclick="addEducation()">+ Add Education</button>
+                </div>
+
+                <!-- Courses Section -->
+                <div class="admin-section">
+                    <h3>Relevant Coursework</h3>
+                    <div class="form-group">
+                        <label>Enter courses separated by line breaks</label>
+                        <textarea class="form-control" id="edit-courses" style="min-height: 120px;"></textarea>
+                    </div>
+                </div>
+
+                <!-- Activities Section -->
+                <div class="admin-section">
+                    <h3>Activities & Certifications</h3>
+                    <div class="form-group">
+                        <label>Enter activities separated by line breaks</label>
+                        <textarea class="form-control" id="edit-activities" style="min-height: 120px;"></textarea>
+                    </div>
+                </div>
+
+                <!-- Experience Section -->
+                <div class="admin-section">
+                    <h3>Experience</h3>
+                    <div id="edit-experience-list"></div>
+                    <button class="add-btn" onclick="addExperience()">+ Add Experience</button>
+                </div>
+
+                <!-- Skills Section -->
+                <div class="admin-section">
+                    <h3>Skills Data (JSON format)</h3>
+                    <div class="form-group">
+                        <label>Edit groups and arrays cleanly using standard JSON format.</label>
+                        <textarea class="form-control" id="edit-skills" style="min-height: 200px; font-family: monospace; white-space: pre;"></textarea>
+                    </div>
+                </div>
+
+                <!-- Photos Section -->
+                <div class="admin-section">
+                    <h3>Photo Gallery</h3>
+                    <div id="edit-photos-list"></div>
+                    <button class="add-btn" onclick="addPhoto()">+ Add Photo</button>
+                </div>
+
+            </div>
+
+            <div class="admin-footer">
+                <button class="save-btn" onclick="saveAdminData()">Save Site Changes</button>
+                <p style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: 8px;">Will prompt you to overwrite your data.js file.</p>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="data.js"></script>
+
+    <script>
+        // --- Theme Toggle Logic ---
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            const target = current === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', target);
+            
+            const icon = document.getElementById('theme-icon');
+            icon.setAttribute('data-lucide', target === 'dark' ? 'sun' : 'moon');
+            lucide.createIcons();
+            
+            localStorage.setItem('portfolio-theme', target);
+        }
+
+        const savedTheme = localStorage.getItem('portfolio-theme');
+        if (savedTheme) {
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+
+        // Scrolled header effect
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('main-header');
+            if (window.scrollY > 20) header.classList.add('scrolled');
+            else header.classList.remove('scrolled');
+        });
+
+        // Setup Scroll Animations based on IntersectionObserver
+        function setupIntersectionObserver() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+
+            document.querySelectorAll('.fade-in-up').forEach(el => observer.observe(el));
+        }
+
+        // --- Render Site Data ---
+        function renderSite() {
+            // Hero
+            document.getElementById('hero-container').innerHTML = `
+                <div class="hero-tag fade-in-up">${SITE_DATA.profile.tagline}</div>
+                <h1 class="hero-name fade-in-up">${SITE_DATA.profile.name}.</h1>
+                <p class="hero-bio fade-in-up d-1">${SITE_DATA.profile.bio}</p>
+                <div class="contact-links fade-in-up d-2">
+                    <a href="mailto:${SITE_DATA.profile.email}" class="btn-icon" title="Email Me"><i data-lucide="mail"></i></a>
+                    <a href="${SITE_DATA.profile.linkedin}" target="_blank" class="btn-icon" title="LinkedIn"><i data-lucide="linkedin"></i></a>
+                    <a href="${SITE_DATA.profile.resumeFile}" download class="btn-icon" title="Download Resume"><i data-lucide="file-text"></i></a>
+                </div>
+            `;
+
+            // About Me 2-Column
+            let coursesHtml = "";
+            if (SITE_DATA.courses && SITE_DATA.courses.length > 0) {
+                coursesHtml = `
+                    <div class="acc-group" id="acc-courses">
+                        <div class="acc-header" onclick="toggleAcc('acc-courses')">
+                            <span>Relevant Coursework</span>
+                            <i data-lucide="chevron-down" class="acc-icon" size="18"></i>
+                        </div>
+                        <div class="acc-content"><div class="acc-content-inner">
+                            <ul class="list-items">${SITE_DATA.courses.map(c => `<li>${c}</li>`).join('')}</ul>
+                        </div></div>
+                    </div>`;
+            }
+            
+            let activitiesHtml = "";
+            if (SITE_DATA.activities && SITE_DATA.activities.length > 0) {
+                activitiesHtml = `
+                    <div class="acc-group" id="acc-activities">
+                        <div class="acc-header" onclick="toggleAcc('acc-activities')">
+                            <span>Activities & Certifications</span>
+                            <i data-lucide="chevron-down" class="acc-icon" size="18"></i>
+                        </div>
+                        <div class="acc-content"><div class="acc-content-inner">
+                            <ul class="list-items">${SITE_DATA.activities.map(a => `<li>${a}</li>`).join('')}</ul>
+                        </div></div>
+                    </div>`;
+            }
+
+            // Render right side Education boxes dynamically
+            const educationBoxesHtml = SITE_DATA.education.map(edu => `
+                <div class="edu-card" style="margin-bottom: 1rem;">
+                    <div class="edu-school">${edu.school}</div>
+                    <div class="edu-details">${edu.details}</div>
+                </div>
+            `).join('');
+
+            document.getElementById('about-container').innerHTML = `
+                <div class="about-bio">${SITE_DATA.profile.about || SITE_DATA.profile.bio}</div>
+                <div class="about-sidebar">
+                    ${educationBoxesHtml}
+                    ${coursesHtml}
+                    ${activitiesHtml}
+                </div>
+            `;
+
+            // Experience (Accordions)
+            document.getElementById('experience-container').innerHTML = SITE_DATA.experience.map((exp, i) => `
+                <div class="exp-card" id="exp-${i}">
+                    <div class="exp-header" onclick="toggleExp('exp-${i}')">
+                        <img src="${exp.logo}" alt="Logo" class="company-logo" onerror="this.style.display='none'">
+                        <div class="exp-info">
+                            <div class="exp-role-row">
+                                <span class="exp-company">${exp.company}</span>
+                            </div>
+                            <div class="exp-title">${exp.title}</div>
+                        </div>
+                        <div class="exp-meta">
+                            <span class="exp-date">${exp.date}</span>
+                            <i data-lucide="chevron-down" class="exp-chevron" size="18"></i>
+                        </div>
+                    </div>
+                    <div class="exp-body"><div class="exp-body-inner">
+                        <ul class="exp-details">
+                            ${(exp.bullets || []).map(b => `<li>${b}</li>`).join('')}
+                        </ul>
+                    </div></div>
+                </div>
+            `).join('');
+
+            // Skills (Accordions with Pills)
+            if (SITE_DATA.skills) {
+                const skillsHtml = Object.entries(SITE_DATA.skills).map(([category, items], i) => `
+                    <div class="skill-acc" id="skill-${i}">
+                        <div class="skill-header" onclick="toggleSkill('skill-${i}')">
+                            <span class="skill-title">${category}</span>
+                            <div class="skill-meta">
+                                <span class="skill-count">${items.length} items</span>
+                                <i data-lucide="chevron-down" class="acc-icon" size="18"></i>
+                            </div>
+                        </div>
+                        <div class="skill-content"><div class="skill-pills">
+                            ${items.map(skill => `<span class="skill-pill">${skill}</span>`).join('')}
+                        </div></div>
+                    </div>
+                `).join('');
+                document.getElementById('skills-container').innerHTML = skillsHtml;
+            }
+
+            // Gallery
+            document.getElementById('gallery-container').innerHTML = (SITE_DATA.photos || []).map(photo => `
+                <img src="${photo.src}" alt="${photo.caption}" class="gallery-photo" title="${photo.caption}">
+            `).join('');
+
+            // Init Icons
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+            document.getElementById('theme-icon').setAttribute('data-lucide', currentTheme === 'dark' ? 'sun' : 'moon');
+            lucide.createIcons();
+            
+            // Re-trigger observer for new dynamic nodes
+            setupIntersectionObserver();
+        }
+
+        // --- Accordion Logic ---
+        function toggleAcc(id) {
+            const grp = document.getElementById(id);
+            const content = grp.querySelector('.acc-content');
+            if(grp.classList.contains('open')) {
+                grp.classList.remove('open');
+                content.style.maxHeight = null;
+            } else {
+                grp.classList.add('open');
+                content.style.maxHeight = content.scrollHeight + "px";
+            }
+        }
+
+        function toggleExp(id) {
+            const card = document.getElementById(id);
+            const content = card.querySelector('.exp-body');
+            if (card.classList.contains('expanded')) {
+                card.classList.remove('expanded');
+                content.style.maxHeight = null;
+            } else {
+                card.classList.add('expanded');
+                content.style.maxHeight = content.scrollHeight + "px";
+            }
+        }
+
+        function toggleSkill(id) {
+            const card = document.getElementById(id);
+            const content = card.querySelector('.skill-content');
+            if (card.classList.contains('open')) {
+                card.classList.remove('open');
+                content.style.maxHeight = null;
+            } else {
+                card.classList.add('open');
+                content.style.maxHeight = content.scrollHeight + "px";
+            }
+        }
+
+        renderSite();
+
+        // --- Splash Screen & Typewriter Animation ---
+        async function runSplash() {
+            const fullName = SITE_DATA.profile.name;
+            const initials = "GL";
+            
+            const splashText = document.getElementById('splash-text');
+            const splashScreen = document.getElementById('splash-screen');
+            const wrapper = document.getElementById('main-wrapper');
+            const navLogo = document.getElementById('nav-logo');
+            
+            navLogo.innerText = initials;
+            navLogo.style.opacity = '0'; // Hide temporarily
+            
+            await new Promise(r => setTimeout(r, 500));
+
+            // Type out name
+            for (let i = 0; i <= fullName.length; i++) {
+                splashText.innerText = fullName.substring(0, i);
+                await new Promise(r => setTimeout(r, i === fullName.length ? 600 : 70));
+            }
+
+            // Backspace down to 'G'
+            for (let i = fullName.length; i >= 1; i--) {
+                splashText.innerText = fullName.substring(0, i);
+                await new Promise(r => setTimeout(r, 50));
+            }
+
+            // Type out 'L'
+            splashText.innerText = "G";
+            await new Promise(r => setTimeout(r, 70));
+            splashText.innerText = "GL";
+            await new Promise(r => setTimeout(r, 400));
+            
+            // Stop blinking cursor
+            splashText.classList.remove('typing-cursor');
+            splashText.style.borderRightColor = "transparent";
+            await new Promise(r => setTimeout(r, 200));
+
+            // Force reflow and show main wrapper (to get coordinates)
+            wrapper.style.opacity = '0';
+            wrapper.classList.remove('content-hidden');
+            wrapper.classList.add('content-ready');
+            
+            // Get Target Coordinates
+            const targetRect = navLogo.getBoundingClientRect();
+
+            // Trigger Transition
+            splashText.style.top = `${targetRect.top}px`;
+            splashText.style.left = `${targetRect.left}px`;
+            splashText.style.transform = `translate(0, 0)`;
+            splashText.style.fontSize = `1.25rem`;
+            splashScreen.style.backgroundColor = "transparent";
+            
+            // Fade in site content
+            wrapper.style.opacity = '1';
+
+            await new Promise(r => setTimeout(r, 800));
+
+            // Morph to initials
+            splashText.style.opacity = '0';
+            navLogo.style.opacity = '1';
+            
+            setTimeout(() => {
+                splashScreen.style.display = "none";
+                // Trigger intersection observer on visible elements on initial load
+                window.dispatchEvent(new Event('scroll'));
+            }, 500);
+        }
+
+        // Run splash if not in edit mode
+        if (!window.location.search.includes('?edit=admin')) {
+            window.addEventListener('load', runSplash);
+        } else {
+            // Instantly show content for admin
+            document.getElementById('nav-logo').innerText = "GL";
+            document.getElementById('splash-screen').style.display = 'none';
+            document.getElementById('main-wrapper').classList.remove('content-hidden');
+            document.getElementById('main-wrapper').classList.add('content-ready');
+        }
+
+        // --- EXHAUSTIVE CMS ADMIN LOGIC ---
+        let adminState = JSON.parse(JSON.stringify(SITE_DATA));
+
+        function openAdmin() { 
+            // Re-sync just in case
+            adminState = JSON.parse(JSON.stringify(SITE_DATA));
+            document.getElementById('admin-modal').classList.add('open'); 
+            renderAdminForms(); 
+        }
+        function closeAdmin() { document.getElementById('admin-modal').classList.remove('open'); }
+
+        function renderAdminForms() {
+            // Profile
+            document.getElementById('edit-name').value = adminState.profile.name || "";
+            document.getElementById('edit-tagline').value = adminState.profile.tagline || "";
+            document.getElementById('edit-avatar').value = adminState.profile.avatarUrl || "";
+            document.getElementById('edit-bio').value = adminState.profile.bio || "";
+            document.getElementById('edit-about').value = adminState.profile.about || adminState.profile.bio || "";
+            document.getElementById('edit-email').value = adminState.profile.email || "";
+            document.getElementById('edit-linkedin').value = adminState.profile.linkedin || "";
+            document.getElementById('edit-resume').value = adminState.profile.resumeFile || "resume.pdf";
+
+            // Education
+            document.getElementById('edit-education-list').innerHTML = (adminState.education || []).map((edu, idx) => `
+                <div class="admin-list-item">
+                    <button class="remove-btn" onclick="removeEducation(${idx})"><i data-lucide="trash-2" size="14"></i></button>
+                    <div class="form-group"><label>School / Institution</label>
+                        <input class="form-control" value="${edu.school}" onchange="updateEdu(${idx}, 'school', this.value)"></div>
+                    <div class="form-group"><label>Details</label>
+                        <input class="form-control" value="${edu.details}" onchange="updateEdu(${idx}, 'details', this.value)"></div>
+                </div>
+            `).join('');
+
+            // Courses & Activities
+            document.getElementById('edit-courses').value = (adminState.courses || []).join('\n');
+            document.getElementById('edit-activities').value = (adminState.activities || []).join('\n');
+            
+            // Experience (Includes Bullets)
+            document.getElementById('edit-experience-list').innerHTML = (adminState.experience || []).map((exp, idx) => `
+                <div class="admin-list-item">
+                    <button class="remove-btn" onclick="removeExperience(${idx})"><i data-lucide="trash-2" size="14"></i></button>
+                    <div class="form-row">
+                        <div class="form-group"><label>Job Title</label>
+                            <input class="form-control" value="${exp.title}" onchange="updateExp(${idx}, 'title', this.value)"></div>
+                        <div class="form-group"><label>Company</label>
+                            <input class="form-control" value="${exp.company}" onchange="updateExp(${idx}, 'company', this.value)"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Date Range</label>
+                            <input class="form-control" value="${exp.date}" onchange="updateExp(${idx}, 'date', this.value)"></div>
+                        <div class="form-group"><label>Logo URL/Path</label>
+                            <input class="form-control" value="${exp.logo || ''}" onchange="updateExp(${idx}, 'logo', this.value)"></div>
+                    </div>
+                    <div class="form-group"><label>Bullet Points (One per line)</label>
+                        <textarea class="form-control" onchange="updateExpBullets(${idx}, this.value)" style="min-height: 80px;">${(exp.bullets || []).join('\n')}</textarea></div>
+                </div>
+            `).join('');
+
+            // Skills JSON
+            document.getElementById('edit-skills').value = JSON.stringify(adminState.skills || {}, null, 4);
+
+            // Photos
+            document.getElementById('edit-photos-list').innerHTML = (adminState.photos || []).map((photo, idx) => `
+                <div class="admin-list-item">
+                    <button class="remove-btn" onclick="removePhoto(${idx})"><i data-lucide="trash-2" size="14"></i></button>
+                    <div class="form-group"><label>Image URL</label>
+                        <input class="form-control" value="${photo.src}" onchange="updatePhoto(${idx}, 'src', this.value)"></div>
+                    <div class="form-group"><label>Caption</label>
+                        <input class="form-control" value="${photo.caption}" onchange="updatePhoto(${idx}, 'caption', this.value)"></div>
+                </div>
+            `).join('');
+
+            lucide.createIcons();
+        }
+
+        // Edu Editor Handlers
+        function updateEdu(idx, field, val) { adminState.education[idx][field] = val; }
+        function removeEducation(idx) { adminState.education.splice(idx, 1); renderAdminForms(); }
+        function addEducation() { 
+            if(!adminState.education) adminState.education = [];
+            adminState.education.push({ school: "New School", details: "Major / Years" }); 
+            renderAdminForms(); 
+        }
+
+        // Exp Editor Handlers
+        function updateExp(index, field, value) { adminState.experience[index][field] = value; }
+        function updateExpBullets(index, text) { 
+            adminState.experience[index].bullets = text.split('\n').map(s=>s.trim()).filter(s=>s.length > 0);
+        }
+        function removeExperience(index) { adminState.experience.splice(index, 1); renderAdminForms(); }
+        function addExperience() { 
+            if(!adminState.experience) adminState.experience = [];
+            adminState.experience.push({ title: "Role", date: "Year", company: "Company", logo: "", bullets: [] }); 
+            renderAdminForms(); 
+        }
+
+        // Photo Editor Handlers
+        function updatePhoto(idx, field, val) { adminState.photos[idx][field] = val; }
+        function removePhoto(idx) { adminState.photos.splice(idx, 1); renderAdminForms(); }
+        function addPhoto() { 
+            if(!adminState.photos) adminState.photos = [];
+            adminState.photos.push({ src: "", caption: "New Photo" }); 
+            renderAdminForms(); 
+        }
+
+        async function saveAdminData() {
+            // Profile Sync
+            adminState.profile.name = document.getElementById('edit-name').value;
+            adminState.profile.tagline = document.getElementById('edit-tagline').value;
+            adminState.profile.avatarUrl = document.getElementById('edit-avatar').value;
+            adminState.profile.bio = document.getElementById('edit-bio').value;
+            adminState.profile.about = document.getElementById('edit-about').value;
+            adminState.profile.email = document.getElementById('edit-email').value;
+            adminState.profile.linkedin = document.getElementById('edit-linkedin').value;
+            adminState.profile.resumeFile = document.getElementById('edit-resume').value;
+
+            // Courses/Activities Sync
+            const coursesRaw = document.getElementById('edit-courses').value;
+            adminState.courses = coursesRaw.split('\n').map(s=>s.trim()).filter(s=>s.length>0);
+            
+            const actsRaw = document.getElementById('edit-activities').value;
+            adminState.activities = actsRaw.split('\n').map(s=>s.trim()).filter(s=>s.length>0);
+
+            // Skills Sync (JSON Parse)
+            try {
+                const skillsJson = document.getElementById('edit-skills').value;
+                adminState.skills = JSON.parse(skillsJson);
+            } catch (e) {
+                alert("Failed to save: Invalid JSON format in Skills section. Please fix and try again.");
+                return;
+            }
+            
+            // Re-trigger experience bullet sync strictly via DOM read in case they blurred without onChange firing properly
+            // (Normally onChange fires on blur, but just to be safe, we could read the textareas directly, but our onChange pattern is standard and sufficient in modern browsers).
+            
+            const jsContent = `const SITE_DATA = ${JSON.stringify(adminState, null, 4)};`;
+            
+            try {
+                if ('showSaveFilePicker' in window) {
+                    const handle = await window.showSaveFilePicker({ 
+                        suggestedName: 'data.js', 
+                        types: [{ description: 'JavaScript File', accept: { 'text/javascript': ['.js'] } }]
+                    });
+                    const writable = await handle.createWritable();
+                    await writable.write(jsContent);
+                    await writable.close();
+                    
+                    // Live Update
+                    Object.assign(SITE_DATA, adminState);
+                    renderSite();
+                    closeAdmin();
+                    alert("✅ Site saved successfully! Your portfolio has been updated.");
+                } else {
+                    // Fallback for Safari/Mobile
+                    const blob = new Blob([jsContent], { type: 'text/javascript' });
+                    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'data.js'; a.click();
+                    alert("✅ data.js downloaded. Please replace your old data.js file with this new one.");
+                }
+            } catch (err) {
+                if(err.name !== 'AbortError') { alert("Save failed: " + err.message); }
+            }
+        }
+
+        // Show edit button if in admin mode
+        if (window.location.search.includes('?edit=admin')) {
+            document.getElementById('edit-fab-btn').style.display = 'flex';
+        }
+    </script>
+</body>
+</html>

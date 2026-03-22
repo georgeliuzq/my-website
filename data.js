@@ -2,7 +2,7 @@ const SITE_DATA = {
     "profile": {
         "name": "George Liu",
         "tagline": "Honors Biomedical Engineering Student",
-        "bio": "Junior at The Ohio State University bridging clinical care and engineering innovation. Passionate about medicine, healthcare innovation, and biotech/pharma consulting.",
+        "bio": "Bridging clinical care, engineering innovation, and business strategy. ",
         "about": "Junior at The Ohio State University bridging clinical care and engineering innovation. Passionate about medicine, healthcare innovation, and biotech/pharma consulting. \n\nI have strong interests in intersection of healthcare and engineering, and have hopes to join a healthcare startup. \n\nOriginally from Ohio, I love eating, spending time outdoors, soccer, Game of Thrones, Chess, and building Legos. ",
         "avatarUrl": "https://media.licdn.com/dms/image/v2/D5603AQEsJNOADhK_sA/profile-displayphoto-shrink_200_200/B56ZahvcJaGgAY-/0/1746470290474?e=2147483647&v=beta&t=J7b2EChUeU96X4fXBecZW5VRb3KgbtHSeBuqZBg56vE",
         "email": "georgeliuzq@gmail.com",

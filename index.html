@@ -1001,6 +1001,18 @@
             </div>
 
             <div class="admin-body" id="admin-forms">
+                <!-- Deployment Settings Section -->
+                <div class="admin-section" style="border: 1px solid var(--accent); background: rgba(59, 130, 246, 0.05); margin-bottom: 2rem;">
+                    <h3 style="color: var(--accent); border-bottom-color: rgba(59, 130, 246, 0.2);">🚀 Automatic Live Deployment</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; line-height: 1.5;">
+                        Connect to GitHub to save directly to your live site. Your token is securely stored <strong>only in this browser</strong>. Leave this empty to use the standard manual file download.
+                    </p>
+                    <div class="form-group">
+                        <label>GitHub Personal Access Token</label>
+                        <input type="password" class="form-control" id="edit-github-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" onchange="localStorage.setItem('gh_pat', this.value)">
+                    </div>
+                </div>
+
                 <!-- Profile Section -->
                 <div class="admin-section">
                     <h3>Profile Information</h3>
@@ -1394,6 +1406,9 @@
         function closeAdmin() { document.getElementById('admin-modal').classList.remove('open'); }
 
         function renderAdminForms() {
+            // Deployment Token (Loaded from LocalStorage)
+            document.getElementById('edit-github-token').value = localStorage.getItem('gh_pat') || "";
+
             // Profile
             document.getElementById('edit-name').value = adminState.profile.name || "";
             document.getElementById('edit-tagline').value = adminState.profile.tagline || "";
@@ -1518,6 +1533,60 @@
             // (Normally onChange fires on blur, but just to be safe, we could read the textareas directly, but our onChange pattern is standard and sufficient in modern browsers).
 
             const jsContent = `const SITE_DATA = ${JSON.stringify(adminState, null, 4)};`;
+
+            // ----------- GITHUB CLOUD DEPLOYMENT LOGIC -----------
+            const token = localStorage.getItem('gh_pat');
+            
+            if (token && token.trim() !== '') {
+                const btn = document.querySelector('.save-btn');
+                const originalText = btn.innerText;
+                try {
+                    btn.innerText = "Deploying to GitHub...";
+                    btn.disabled = true;
+
+                    // 1. Get current file SHA to overwrite it
+                    const getRes = await fetch("https://api.github.com/repos/georgeliuzq/my-website/contents/data.js", {
+                        headers: { "Authorization": `Bearer ${token}` }
+                    });
+                    
+                    if (!getRes.ok) throw new Error("Failed to authenticate or find repo. Check your token.");
+                    
+                    const fileData = await getRes.json();
+                    const sha = fileData.sha;
+
+                    // 2. Put new file content (Safe UTF-8 to Base64 encode)
+                    const base64Content = btoa(unescape(encodeURIComponent(jsContent)));
+
+                    const putRes = await fetch("https://api.github.com/repos/georgeliuzq/my-website/contents/data.js", {
+                        method: "PUT",
+                        headers: {
+                            "Authorization": `Bearer ${token}`,
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            message: "Auto-deployed data.js from Admin CMS",
+                            content: base64Content,
+                            sha: sha
+                        })
+                    });
+
+                    if (!putRes.ok) throw new Error("Failed to push changes to GitHub.");
+
+                    Object.assign(SITE_DATA, adminState);
+                    renderSite();
+                    closeAdmin();
+                    alert("🚀 SUCCESS! Changes deployed directly to GitHub. Your live site will update in ~30-60 seconds.");
+                    
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                    return; // Exit successfully without doing manual download
+                } catch (err) {
+                    alert("GitHub Deployment Error:\n" + err.message + "\n\nFalling back to manual file download.");
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                }
+            }
+            // -----------------------------------------------------
 
             try {
                 if ('showSaveFilePicker' in window) {
